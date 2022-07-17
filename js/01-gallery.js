@@ -3,7 +3,7 @@ import { galleryItems } from "./gallery-items.js";
 const galleryContainer = document.querySelector(".gallery");
 const imagesMarkup = createImageGalleryMarkup(galleryItems);
 
-galleryContainer.insertAdjacentHTML("afterbegin", imagesMarkup);
+galleryContainer.innerHTML = imagesMarkup;
 
 galleryContainer.addEventListener("click", onGalleryContainerClick);
 
@@ -29,12 +29,30 @@ function createImageGalleryMarkup(arr) {
 function onGalleryContainerClick(e) {
   e.preventDefault();
   const imageEl = e.target;
-
+  const originalSrc = imageEl.dataset.source;
   const isImageEl = imageEl.classList.contains("gallery__image");
 
   if (!isImageEl) return;
 
-  //const original = imageEl.dataset.source
+  const instance = basicLightbox.create(
+    `
+    <img src="${originalSrc}" width="800" height="600">
+`,
+    {
+      onShow: () => {
+        window.addEventListener("keydown", onEscKeyDown);
+      },
+      onClose: () => {
+        window.removeEventListener("keydown", onEscKeyDown);
+      },
+    }
+  );
 
-  console.log(imageEl.dataset.source);
+  instance.show();
+
+  function onEscKeyDown(e) {
+    if (e.code === "Escape") {
+      instance.close();
+    }
+  }
 }
